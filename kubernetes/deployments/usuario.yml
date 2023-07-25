@@ -1,0 +1,64 @@
+#* =========  usuario =========
+# ! ------------ deployment ------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: usuario
+  namespace: proyecto
+spec:
+  selector:
+    matchLabels:
+      app: usuario
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: usuario
+    spec:
+      containers:
+        - name: usuario
+          # image: serchiboi/proy1_api:latest
+          image: alvarosp24/ayd2_usuario:latest
+          env:
+            - name: DB_HOST
+              value: "34.132.216.220"
+            - name: DB_USER
+              value: "root"
+            - name: DB_PASS
+              value: "Pokemon*150"
+            - name: DB_NAME
+              value: "mydb"
+            - name: DB_PORT
+              value: "3306"
+            - name: SERVER_PORT
+              value: "3008"
+            - name: CRYPTO_ALGORITHM
+              value: aes-256-cbc
+            - name: CRYPTO_KEY
+              value: 0123456789abcdef0123456789abcdef
+            - name: CRYPTO_IV
+              value: 0123456789abcdef
+            - name: JWT_SECRET
+              value: analisis2junio2023
+            - name: CRYPTO_KEY_FRONTEND
+              value: 0123456789abcdef01234567frontend
+            - name: REACT_APP_CRYPTO_KEY
+              value: 0123456789abcdef01234567frontend
+          ports:
+            - containerPort: 3008
+---
+# ! ------------ Service ------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: usuario
+  namespace: proyecto
+spec:
+  selector:
+    app: usuario
+  ports:
+    - name: usuario
+      port: 3008
+      targetPort: 3008
+  type: ClusterIP
+  # loadBalancerIP: 34.69.102.140

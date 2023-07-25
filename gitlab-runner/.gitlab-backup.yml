@@ -1,0 +1,541 @@
+
+test_sesion:
+  stage: test
+  tags:
+    - docker
+  image: node:16-alpine
+  script:
+    - cd backend
+    - cd sesion
+    - npm i
+    - node src/index.js&
+    - npm test
+  only:
+    refs:
+      - develop
+    changes:
+      - backend/sesion/**/*
+  allow_failure: false
+
+
+test_empleado:
+  stage: test
+  tags:
+    - docker
+  image: node:16-alpine
+  script:
+    - cd backend
+    - cd sesion
+    - npm i
+    - node src/index.js&
+    - cd ..
+    - cd empleado
+    - npm i
+    - node src/index.js&
+    - npm test
+  only:
+    refs:
+      - develop
+    changes:
+      - backend/empleado/**/*
+  allow_failure: false
+
+
+
+##----------------------------------------------------
+build_prediccion:
+  stage: build
+  tags:
+    - docker
+  script:
+    - docker build -t audrie8a/sa_prediccion ./backend/prediccion;
+    - docker save audrie8a/sa_prediccion > sa_prediccion.zip;
+  artifacts:
+    paths:
+      - sa_prediccion.zip
+  only:
+    refs:
+      - develop
+    changes:
+      - backend/prediccion/**/*
+  allow_failure: false
+
+build_admin:
+  stage: build
+  tags:
+    - docker
+  script:
+    - docker build -t audrie8a/sa_admin ./backend/admin;
+    - docker save audrie8a/sa_admin > sa_admin.zip;
+  artifacts:
+    paths:
+      - sa_admin.zip
+  only:
+    refs:
+      - develop
+    changes:
+      - backend/admin/**/*
+  needs:
+    - test_admin
+  allow_failure: false
+
+build_cliente:
+  stage: build
+  tags:
+    - docker
+  script:
+    - docker build -t audrie8a/sa_cliente ./backend/cliente;
+    - docker save audrie8a/sa_cliente > sa_cliente.zip;
+  artifacts:
+    paths:
+      - sa_cliente.zip
+  only:
+    refs:
+      - develop
+    changes:
+      - backend/cliente/**/*
+  needs:
+    - test_cliente
+  allow_failure: false
+
+
+build_empleado:
+  stage: build
+  tags:
+    - docker
+  script:
+    - docker build -t audrie8a/sa_empleado ./backend/empleado;
+    - docker save audrie8a/sa_empleado > sa_empleado.zip;
+  artifacts:
+    paths:
+      - sa_empleado.zip
+  only:
+    refs:
+      - develop
+    changes:
+      - backend/empleado/**/*
+  needs:
+    - test_empleado
+  allow_failure: false
+
+build_sesion:
+  stage: build
+  tags:
+    - docker
+  script:
+    - docker build -t audrie8a/sa_sesion ./backend/sesion;
+    - docker save audrie8a/sa_sesion > sa_sesion.zip;
+  artifacts:
+    paths:
+      - sa_sesion.zip
+  only:
+    refs:
+      - develop
+    changes:
+      - backend/sesion/**/*
+  needs:
+    - test_sesion
+  allow_failure: false
+
+
+build_frontend:
+  stage: build
+  tags:
+    - docker
+  script:
+    - docker build -t audrie8a/sa_frontend ./frontend
+    - docker save audrie8a/sa_frontend > sa_frontend.zip
+  artifacts:
+    paths:
+      - sa_frontend.zip
+  only:
+    refs:
+      - develop
+    changes:
+      - frontend/**/*
+  allow_failure: false
+
+##--------------------------------------------------------------
+post_prediccion:
+  stage: post
+  tags:
+    - docker
+  before_script:
+    - docker login -u $USERDOCKER -p $PASSDOCKER
+  script:
+    - docker load < sa_prediccion.zip
+    - docker push audrie8a/sa_prediccion:latest
+    # - docker stop sa_admin
+    - docker rmi audrie8a/sa_prediccion
+  only:
+    refs:
+      - develop
+    changes:
+      - backend/prediccion/**/*
+  needs:
+    - build_prediccion
+  allow_failure: false
+
+post_admin:
+  stage: post
+  tags:
+    - docker
+  before_script:
+    - docker login -u $USERDOCKER -p $PASSDOCKER
+  script:
+    - docker load < sa_admin.zip
+    - docker push audrie8a/sa_admin:latest
+    # - docker stop sa_admin
+    - docker rmi audrie8a/sa_admin
+  only:
+    refs:
+      - develop
+    changes:
+      - backend/admin/**/*
+  needs:
+    - build_admin
+  allow_failure: false
+
+post_sesion:
+  stage: post
+  tags:
+    - docker
+  before_script:
+    - docker login -u $USERDOCKER -p $PASSDOCKER
+  script:
+    - docker load < sa_sesion.zip
+    - docker push audrie8a/sa_sesion:latest
+    # - docker stop sa_sesion
+    - docker rmi audrie8a/sa_sesion
+  only:
+    refs:
+      - develop
+    changes:
+      - backend/sesion/**/*
+  needs:
+    - build_sesion
+  allow_failure: false
+
+
+post_cliente:
+  stage: post
+  tags:
+    - docker
+  before_script:
+    - docker login -u $USERDOCKER -p $PASSDOCKER
+  script:
+    - docker load < sa_cliente.zip
+    - docker push audrie8a/sa_cliente:latest
+    # - docker stop sa_cliente
+    - docker rmi audrie8a/sa_cliente
+  only:
+    refs:
+      - develop
+    changes:
+      - backend/cliente/**/*
+  needs:
+    - build_cliente
+  allow_failure: false
+
+
+post_empleado:
+  stage: post
+  tags:
+    - docker
+  before_script:
+    - docker login -u $USERDOCKER -p $PASSDOCKER
+  script:
+    - docker load < sa_empleado.zip
+    - docker push audrie8a/sa_empleado:latest
+    # - docker stop sa_empleado
+    - docker rmi audrie8a/sa_empleado
+  only:
+    refs:
+      - develop
+    changes:
+      - backend/empleado/**/*
+  needs:
+    - build_empleado
+  allow_failure: false
+
+
+post_frontend:
+  stage: post
+  tags:
+    - docker
+  before_script:
+    - docker login -u $USERDOCKER -p $PASSDOCKER
+  script:
+    - docker load < sa_frontend.zip
+    - docker push audrie8a/sa_frontend:latest
+    # - docker stop sa_frontend
+    - docker rmi audrie8a/sa_frontend
+  only:
+    refs:
+      - develop
+    changes:
+      - frontend/**/*
+  needs:
+    - build_frontend
+  allow_failure: false
+
+##------------------------------------------------------------------
+deploy-pre-prediccion:
+  image:
+    name: bitnami/kubectl:latest
+    entrypoint: [""]
+  stage: deploy-pre
+  tags:
+    - docker
+  before_script:
+    - kubectl config get-contexts
+    - kubectl config use-context jodyannre/sa-proyecto-grupo8:pre
+  script:
+    - kubectl delete -f deployments/deploy-prediccion.yml
+    - kubectl apply -f deployments/deploy-prediccion.yml
+    # - kubectl apply -f deployments/service-prediccion.yml
+  only:
+    refs:
+      - develop
+    changes:
+      - backend/prediccion/**/*
+  needs:
+    - post_prediccion
+  allow_failure: false
+
+deploy-pre-front:
+  image:
+    name: bitnami/kubectl:latest
+    entrypoint: [""]
+  stage: deploy-pre
+  tags:
+    - docker
+  before_script:
+    - kubectl config get-contexts
+    - kubectl config use-context jodyannre/sa-proyecto-grupo8:pre
+  script:
+    - kubectl delete -f deployments/deploy-front.yml
+    - kubectl apply -f deployments/deploy-front.yml
+  only:
+    refs:
+      - develop
+    changes:
+      - frontend/**/*
+  needs:
+    - post_frontend
+  allow_failure: false
+
+deploy-pre-admin:
+  image:
+    name: bitnami/kubectl:latest
+    entrypoint: [""]
+  stage: deploy-pre
+  tags:
+    - docker
+  before_script:
+    - kubectl config get-contexts
+    - kubectl config use-context jodyannre/sa-proyecto-grupo8:pre
+  script:
+    - kubectl delete -f deployments/deploy-admin.yml
+    - kubectl apply -f deployments/deploy-admin.yml
+  only:
+    refs:
+      - develop
+    changes:
+      - backend/admin/**/*
+  needs:
+    - post_admin
+  allow_failure: false
+
+deploy-pre-cliente:
+  image:
+    name: bitnami/kubectl:latest
+    entrypoint: [""]
+  stage: deploy-pre
+  tags:
+    - docker
+  before_script:
+    - kubectl config get-contexts
+    - kubectl config use-context jodyannre/sa-proyecto-grupo8:pre
+  script:
+    - kubectl delete -f deployments/deploy-cliente.yml
+    - kubectl apply -f deployments/deploy-cliente.yml
+  only:
+    refs:
+      - develop
+    changes:
+      - backend/cliente/**/*
+  needs:
+    - post_cliente
+  allow_failure: false
+
+deploy-pre-empleado:
+  image:
+    name: bitnami/kubectl:latest
+    entrypoint: [""]
+  stage: deploy-pre
+  tags:
+    - docker
+  before_script:
+    - kubectl config get-contexts
+    - kubectl config use-context jodyannre/sa-proyecto-grupo8:pre
+  script:
+    - kubectl delete -f deployments/deploy-empleado.yml
+    - kubectl apply -f deployments/deploy-empleado.yml
+  only:
+    refs:
+      - develop
+    changes:
+      - backend/empleado/**/*
+  needs:
+    - post_empleado
+  allow_failure: false
+
+deploy-pre-sesion:
+  image:
+    name: bitnami/kubectl:latest
+    entrypoint: [""]
+  stage: deploy-pre
+  tags:
+    - docker
+  before_script:
+    - kubectl config get-contexts
+    - kubectl config use-context jodyannre/sa-proyecto-grupo8:pre
+  script:
+    - kubectl delete -f deployments/deploy-sesion.yml
+    - kubectl apply -f deployments/deploy-sesion.yml
+  only:
+    refs:
+      - develop
+    changes:
+      - backend/sesion/**/*
+  needs:
+    - post_sesion
+  allow_failure: false
+
+##-----------------------AMBIENTE PRODUCCION--------------------------
+deploy-prediccion:
+  image:
+    name: bitnami/kubectl:latest
+    entrypoint: [""]
+  stage: deploy
+  tags:
+    - docker
+  before_script:
+    - kubectl config get-contexts
+    - kubectl config use-context jodyannre/sa-proyecto-grupo8:kube
+  script:
+    - kubectl delete -f deployments/deploy-prediccion.yml
+    - kubectl apply -f deployments/deploy-prediccion.yml
+    # - kubectl apply -f deployments/service-prediccion.yml
+  only:
+    refs:
+      - main
+    changes:
+      - backend/prediccion/**/*
+  allow_failure: false
+
+deploy-front:
+  image:
+    name: bitnami/kubectl:latest
+    entrypoint: [""]
+  stage: deploy
+  tags:
+    - docker
+  before_script:
+    - kubectl config get-contexts
+    - kubectl config use-context jodyannre/sa-proyecto-grupo8:kube
+  script:
+    - kubectl delete -f deployments/deploy-main-front.yml
+    - kubectl apply -f deployments/deploy-main-front.yml
+    # - kubectl apply -f deployments/service-front.yml
+  only:
+    refs:
+      - main
+    changes:
+      - frontend/**/*
+  allow_failure: false
+
+deploy-admin:
+  image:
+    name: bitnami/kubectl:latest
+    entrypoint: [""]
+  stage: deploy
+  tags:
+    - docker
+  before_script:
+    - kubectl config get-contexts
+    - kubectl config use-context jodyannre/sa-proyecto-grupo8:kube
+  script:
+    - kubectl delete -f deployments/deploy-admin.yml
+    - kubectl apply -f deployments/deploy-admin.yml
+    # - kubectl apply -f deployments/service-admin.yml
+  only:
+    refs:
+      - main
+    changes:
+      - backend/admin/**/*
+  allow_failure: false
+
+deploy-cliente:
+  image:
+    name: bitnami/kubectl:latest
+    entrypoint: [""]
+  stage: deploy
+  tags:
+    - docker
+  before_script:
+    - kubectl config get-contexts
+    - kubectl config use-context jodyannre/sa-proyecto-grupo8:kube
+  script:
+    - kubectl delete -f deployments/deploy-cliente.yml
+    - kubectl apply -f deployments/deploy-cliente.yml
+    # - kubectl apply -f deployments/service-cliente.yml
+  only:
+    refs:
+      - main
+    changes:
+      - backend/cliente/**/*
+  allow_failure: false
+
+deploy-empleado:
+  image:
+    name: bitnami/kubectl:latest
+    entrypoint: [""]
+  stage: deploy
+  tags:
+    - docker
+  before_script:
+    - kubectl config get-contexts
+    - kubectl config use-context jodyannre/sa-proyecto-grupo8:kube
+  script:
+    - kubectl delete -f deployments/deploy-empleado.yml
+    - kubectl apply -f deployments/deploy-empleado.yml
+    # - kubectl apply -f deployments/service-empleado.yml
+  only:
+    refs:
+      - main
+    changes:
+      - backend/empleado/**/*
+  allow_failure: false
+
+deploy-sesion:
+  image:
+    name: bitnami/kubectl:latest
+    entrypoint: [""]
+  stage: deploy
+  tags:
+    - docker
+  before_script:
+    - kubectl config get-contexts
+    - kubectl config use-context jodyannre/sa-proyecto-grupo8:kube
+  script:
+    - kubectl delete -f deployments/deploy-sesion.yml
+    - kubectl apply -f deployments/deploy-sesion.yml
+    # - kubectl apply -f deployments/service-sesion.yml
+  only:
+    refs:
+      - main
+    changes:
+      - backend/sesion/**/*
+  allow_failure: false

@@ -1,0 +1,7 @@
+.cgeneral {
+
+    background-size: cover;
+    background-position: center;
+    width: 100vw; /* Opcional: ajusta el ancho del contenedor al 100% del ancho de la ventana */
+    height: 100vh; /* Opcional: ajusta la altura del contenedor al 100% de la altura de la ventana */
+  } 

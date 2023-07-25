@@ -1,0 +1,43 @@
+* {
+  font-family: "Varela Round", sans-serif;
+}
+/* Estilo para el aside */
+aside {
+  position: fixed;
+  top: 8%;
+  left: 0;
+  width: 20%;
+  height: 80%;
+  background-color: #223263;
+  z-index: 1000;
+  border-radius: 10px;
+}
+
+/* Estilo para los elementos li */
+li {
+  list-style-type: none;
+}
+
+/* Estilo para los elementos Link dentro de los li */
+li > a {
+  display: block;
+  padding: 10px;
+  color: white;
+  text-decoration: none;
+}
+
+/* Estilo para los elementos Link al pasar el mouse */
+li > a:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Estilo para los elementos Link al ser seleccionados */
+li > a.active {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+.center-contentsidebar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}

@@ -1,0 +1,134 @@
+version: '3.3'
+services:
+  admin:
+    container_name: admin
+    restart: always
+    build: ./backend/Admin
+    image: admin_g2_ayd2
+    ports:
+      - '4001:4001'
+    env_file:
+      - ./backend/Admin/.env
+    networks:
+      - aymusica
+  albumscrear:
+    container_name: albumscrear
+    restart: always
+    build: ./backend/Albums/Crear
+    image: albumscrear_g2_ayd2
+    ports:
+      - '3001:3001'
+    env_file:
+      - ./backend/Albums/Crear/.env
+    networks:
+      - aymusica
+  albumseditar:
+    container_name: albumseditar
+    restart: always
+    build: ./backend/Albums/Editar
+    image: albumseditar_g2_ayd2
+    ports:
+      - '3005:3005'
+    env_file:
+      - ./backend/Albums/Editar/.env
+    networks:
+      - aymusica
+  albumseliminar:
+    container_name: albumseliminar
+    restart: always
+    build: ./backend/Albums/Eliminar
+    image: albumseliminar_g2_ayd2
+    ports:
+      - '3004:3004'
+    env_file:
+      - ./backend/Albums/Eliminar/.env
+    networks:
+      - aymusica
+  albumslistar:
+    container_name: albumslistar
+    restart: always
+    build: ./backend/Albums/Listar
+    image: albumslistar_g2_ayd2
+    ports:
+      - '3002:3002'
+    env_file:
+      - ./backend/Albums/Listar/.env
+    networks:
+      - aymusica
+  canciones:
+    container_name: canciones
+    restart: always
+    build: ./backend/Canciones
+    image: canciones_g2_ayd2
+    ports:
+      - '3003:3003'
+    env_file:
+      - ./backend/Canciones/.env
+    networks:
+      - aymusica
+  loginflow:
+    container_name: loginflow
+    restart: always
+    build: ./backend/LoginFlow
+    image: loginflow_g2_ayd2
+    ports:
+      - '4000:4000'
+    env_file:
+      - ./backend/LoginFlow/.env
+    networks:
+      - aymusica
+  usuario:
+    container_name: usuario
+    restart: always
+    build: ./backend/Usuario
+    image: usuario_g2_ayd2
+    ports:
+      - '3008:3008'
+    env_file:
+      - ./backend/Usuario/.env
+    networks:
+      - aymusica
+  middleware:
+    container_name: middleware
+    restart: always
+    build: ./backend/middleware
+    image: middleware_g2_ayd2
+    ports:
+      - '3010:3010'
+    env_file:
+      - ./backend/middleware/.env
+    depends_on:
+      - usuario
+      - loginflow
+      - canciones
+      - albumslistar
+      - albumseliminar
+      - albumseditar
+      - albumscrear
+      - admin
+    networks:
+      - aymusica
+  frontend:
+    container_name: frontend
+    restart: always
+    build: ./frontend
+    image: frontend_g2_ayd2
+    ports:
+      - '3000:3000'
+    env_file:
+      - ./frontend/.env
+    depends_on:
+      - middleware
+    links:
+      - middleware
+    networks:
+      - aymusica
+networks:
+  aymusica:
+    driver: "bridge"
+# sudo docker-compose build --no-cache
+# sudo docker-compose up -d --build
+# sudo docker-compose up -d
+# sudo docker-compose down
+# sudo docker-compose logs -f
+# sudo docker-compose logs -f --tail 100

@@ -1,0 +1,1 @@
+export const url = "http://localhost:3010/" //cambiar por la url el server Node

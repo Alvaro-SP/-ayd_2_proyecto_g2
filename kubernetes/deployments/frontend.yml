@@ -1,0 +1,50 @@
+#* =========  frontend =========
+# ! ------------ deployment ------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: proyecto
+spec:
+  selector:
+    matchLabels:
+      app: frontend
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          # image: serchiboi/proy1_api:latest
+          image: alvarosp24/ayd2_frontend:latest
+          env:
+            - name: REACT_APP_CRYPTO_KEY
+              value: "0123456789abcdef01234567frontend"
+            - name: CRYPTO_ALGORITHM
+              value: "aes-256-cbc"
+            - name: CRYPTO_KEY
+              value: "0123456789abcdef0123456789abcdef"
+            - name: CRYPTO_IV
+              value: "0123456789abcdef"
+            - name: REACT_APP_API_URL
+              value: "http://34.31.204.85:3010?"
+          ports:
+            - containerPort: 3000
+---
+# ! ------------ Service ------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: proyecto
+spec:
+  selector:
+    app: frontend
+  ports:
+    - name: frontend
+      port: 3000
+      targetPort: 3000
+  type: LoadBalancer
+  # loadBalancerIP: 34.72.220.209

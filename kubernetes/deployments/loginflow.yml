@@ -1,0 +1,66 @@
+#* =========  loginflow =========
+# ! ------------ deployment ------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loginflow
+  namespace: proyecto
+spec:
+  selector:
+    matchLabels:
+      app: loginflow
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: loginflow
+    spec:
+      containers:
+        - name: loginflow
+          # image: serchiboi/proy1_api:latest
+          image: alvarosp24/ayd2_loginflow:latest
+          env:
+            - name: DB_HOST
+              value: "34.132.216.220"
+            - name: DB_USER
+              value: "root"
+            - name: DB_PASS
+              value: "Pokemon*150"
+            - name: DB_NAME
+              value: "mydb"
+            - name: DB_PORT
+              value: "3306"
+            - name: SERVER_PORT
+              value: "4000"
+            - name: CRYPTO_ALGORITHM
+              value: aes-256-cbc
+            - name: CRYPTO_KEY
+              value: 0123456789abcdef0123456789abcdef
+            - name: CRYPTO_IV
+              value: 0123456789abcdef
+            - name: JWT_SECRET
+              value: analisis2junio2023
+            - name: MAIL_USER
+              value: aydisco.g2@gmail.com
+            - name: MAIL_PASS
+              value: njojyfgvkjfijnge
+            - name: CRYPTO_KEY_FRONTEND
+              value: 0123456789abcdef01234567frontend
+          ports:
+            - containerPort: 4000
+---
+# ! ------------ Service ------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: loginflow
+  namespace: proyecto
+spec:
+  selector:
+    app: loginflow
+  ports:
+    - name: loginflow
+      port: 4000
+      targetPort: 4000
+  type: ClusterIP
+  # loadBalancerIP: 34.27.88.122

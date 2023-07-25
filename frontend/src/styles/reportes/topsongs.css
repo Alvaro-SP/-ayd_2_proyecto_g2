@@ -1,0 +1,70 @@
+/* Estilos de la tabla */
+.tablareporte {
+  width: 100%;
+  border-collapse: collapse;
+  height: 100%;
+  overflow-y: auto;
+}
+.tablareporte table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tablareporte th,
+.tablareporte td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #000000;
+  background-color: #3434348f;
+  color: #ffffff;
+}
+
+.tablareporte th {
+  background-color: #223263;
+  color: #ffffff;
+}
+
+.tablareporte tr:hover {
+  background-color: #09090993;
+}
+
+/* Estilos de la paginación */
+.pagination-container {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.tablareporte select {
+  margin-right: 10px;
+  padding: 6px 10px;
+  border: 1px solid #000000;
+  border-radius: 4px;
+  background-color: #525252;
+  color: #ffffff;
+}
+
+.tablareporte button {
+  padding: 6px 12px;
+  background-color: #434343;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  color: #ffffff;
+}
+
+.tablareporte button:hover {
+  background-color: #989898;
+}
+.tablareporte button:disabled {
+  background-color: #45454590;
+  cursor: not-allowed;
+}
+
+.containerTopSongs {
+  width: 75%;
+  margin-left: auto;
+  margin-right: 3%;
+  height: 60vh;
+}

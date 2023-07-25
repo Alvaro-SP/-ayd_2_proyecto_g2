@@ -1,0 +1,24 @@
+* {
+  font-family: "Varela Round", sans-serif;
+}
+
+.iconSize {
+  font-size: 2.5rem !important;
+}
+
+.borderRating {
+  border: solid 3px;
+  border-radius: 20px;
+  border-color: #b99e35;
+}
+
+.borderComision {
+  border: solid 3px;
+  border-radius: 20px;
+  border-color: rgb(31, 94, 62);
+}
+.containerProfile {
+  width: 75%;
+  margin-left: auto;
+  margin-right: 3%;
+}

@@ -1,0 +1,77 @@
+#* =========  MIDDLEWARE =========
+# ! ------------ deployment ------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: middleware
+  namespace: proyecto
+spec:
+  selector:
+    matchLabels:
+      app: middleware
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: middleware
+    spec:
+      containers:
+        - name: middleware
+          # image: serchiboi/proy1_api:latest
+          image: alvarosp24/ayd2_middleware:latest
+          env:
+            - name: DB_HOST
+              value: "34.132.216.220"
+            - name: DB_USER
+              value: "root"
+            - name: DB_PASS
+              value: "Pokemon*150"
+            - name: DB_NAME
+              value: "mydb"
+            - name: DB_PORT
+              value: "3306"
+            - name: SERVER_PORT
+              value: "3010"
+            - name: MICROSERVICE_CREAR
+              value: "http://crear:3001/crearalbum"
+            - name: MICROSERVICE_LISTAR
+              value: "http://listar:3002/listaralbums"
+            - name: MICROSERVICE_ELIMINAR
+              value: "http://eliminar:3004/eliminaralbums"
+            - name: MICROSERVICE_EDITAR
+              value: "http://editar:3005/editaralbum"
+            - name: MICROSERVICE_CANCIONESALBUMS
+              value: "http://canciones:3003/getcanciones"
+            - name: MICROSERVICE_CANCION
+              value: "http://canciones:3003/getcancion"
+            - name: MICROSERVICE_CANCIONSINALBUM
+              value: "http://canciones:3003/getcancionessinalbum"
+            - name: MICROSERVICE_INFOCANCIONES
+              value: "http://canciones:3003/infocanciones"
+            - name: MICROSERVICE_SUBIRCANCIONES
+              value: "http://canciones:3003/subircancion"
+            - name: SERVICE_USUARIO
+              value: "http://usuario:3008"
+            - name: SERVICE_LOGINFLOW
+              value: "http://loginflow:4000"
+              # value: "http://34.27.88.122:4000"
+            - name: SERVICE_ADMIN
+              value: "http://admin:4001"
+          ports:
+            - containerPort: 3010
+---
+# ! ------------ Service ------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: middleware
+  namespace: proyecto
+spec:
+  selector:
+    app: middleware
+  ports:
+    - name: middleware
+      port: 3010
+      targetPort: 3010
+  type: LoadBalancer
+  loadBalancerIP: 34.31.204.85

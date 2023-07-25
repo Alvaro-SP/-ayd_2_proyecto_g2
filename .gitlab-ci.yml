@@ -1,0 +1,721 @@
+# image: docker:latest
+
+# services:
+#   - docker:dind
+# El flujo de trabajo DevOps comienza con la integración continúa. Este proceso inicia automáticamente
+# cuando se completa cualquier nueva funcionalidad en las ramas “Feature” en la que se está trabajando
+# y se desea unir el nuevo código con la rama Develop.
+stages:
+  - test
+  - build
+  - post
+  - deploy
+###! ------------------------ TEST UNITARIOS -----------------------------
+#* comienza la fase de pruebas, para ello se procede a construir las imágenes de los contenedores,
+#* realizar su levantamiento y ejecutar pruebas sobre ellos.
+
+test_crear:
+  stage: test
+  tags:
+    - ayd2
+  # image: node:16-alpine
+  script:
+    - cd backend
+    - cd Albums
+    - cd Crear
+    - npm i
+    - npm test
+  only:
+    refs:
+      - develop
+    # changes:
+    #   - backend/Albums/**/*
+  allow_failure: false
+
+test_editar:
+  stage: test
+  tags:
+    - ayd2
+  # image: node:16-alpine
+  script:
+    - cd backend
+    - cd Albums
+    - cd Editar
+    - npm i
+    - npm test
+  only:
+    refs:
+      - develop
+    # changes:
+    #   - backend/Editar/**/*
+  allow_failure: false
+
+test_eliminar:
+  stage: test
+  tags:
+    - ayd2
+  # image: node:16-alpine
+  script:
+    - cd backend
+    - cd Albums
+    - cd Eliminar
+    - npm i
+    - npm test
+  only:
+    refs:
+      - develop
+    # changes:
+    #   - backend/Eliminar/**/*
+  allow_failure: false
+
+test_usuario:
+  stage: test
+  tags:
+    - ayd2
+  # image: node:16-alpine
+  script:
+    - cd backend
+    - cd Usuario
+    - npm i
+    - npm test
+  only:
+    refs:
+      - develop
+    # changes:
+    #   - backend/Usuario/**/*
+  allow_failure: false
+
+test_canciones:
+  stage: test
+  tags:
+    - ayd2
+  # image: node:16-alpine
+  script:
+    - cd backend
+    - cd Canciones
+    - npm i
+    - npm test
+  only:
+    refs:
+      - develop
+    # changes:
+    #   - backend/Canciones/**/*
+  allow_failure: false
+
+###! ------------------------ TEST DE INTEGRACION -----------------------------
+#? Si las pruebas no resultan satisfactorias el flujo se interrumpirá y
+#? no se seguirá con las demás fases del flujo o pipeline.
+
+test_integracion:
+  stage: test
+  tags:
+    - ayd2
+  # image: node:16-alpine
+  script:
+    - cd Integrations
+    - npm i
+    - npm test
+  only:
+    refs:
+      - develop
+    # changes:
+    #   - frontend/src/**/*
+  allow_failure: false
+
+#? En el caso de pasar las pruebas satisfactoriamente, uno de los desarrolladores procederá
+#? a realizar merge de los cambios en la rama Develop dentro de la rama Master (Producción).
+
+###! --------------------- CONSTRUCCION DE IMAGENES -------------------------
+# Una vez realizado el proceso de pruebas satisfactoriamente, se procederán a subir las
+# imágenes de Docker construidas previamente a un repositorio de contenedores (DockerHub).
+# ******** ADMIN ********
+build_admin:
+  stage: build
+  tags:
+    - ayd2
+  script:
+    - docker build -t alvarosp24/ayd2_admin ./backend/Admin;
+    - docker save alvarosp24/ayd2_admin > ayd2_admin.zip;
+  artifacts:
+    paths:
+      - ayd2_admin.zip
+  only:
+    refs:
+      - main
+    changes:
+      - backend/Admin/**/*
+  allow_failure: false
+# ******** ALBUMS ********
+build_crear:
+  stage: build
+  tags:
+    - ayd2
+  script:
+    - docker build -t alvarosp24/ayd2_crear ./backend/Albums/Crear;
+    - docker save alvarosp24/ayd2_crear > ayd2_crear.zip;
+  artifacts:
+    paths:
+      - ayd2_crear.zip
+  only:
+    refs:
+      - main
+    changes:
+      - backend/Albums/Crear/**/*
+  allow_failure: false
+
+build_editar:
+  stage: build
+  tags:
+    - ayd2
+  script:
+    - docker build -t alvarosp24/ayd2_editar ./backend/Albums/Editar;
+    - docker save alvarosp24/ayd2_editar > ayd2_editar.zip;
+  artifacts:
+    paths:
+      - ayd2_editar.zip
+  only:
+    refs:
+      - main
+    changes:
+      - backend/Albums/Editar/**/*
+  allow_failure: false
+
+build_eliminar:
+  stage: build
+  tags:
+    - ayd2
+  script:
+    - docker build -t alvarosp24/ayd2_eliminar ./backend/Albums/Eliminar;
+    - docker save alvarosp24/ayd2_eliminar > ayd2_eliminar.zip;
+  artifacts:
+    paths:
+      - ayd2_eliminar.zip
+  only:
+    refs:
+      - main
+    changes:
+      - backend/Albums/Eliminar/**/*
+  allow_failure: false
+
+build_listar:
+  stage: build
+  tags:
+    - ayd2
+  script:
+    - docker build -t alvarosp24/ayd2_listar ./backend/Albums/Listar;
+    - docker save alvarosp24/ayd2_listar > ayd2_listar.zip;
+  artifacts:
+    paths:
+      - ayd2_listar.zip
+  only:
+    refs:
+      - main
+    changes:
+      - backend/Albums/Listar/**/*
+  allow_failure: false
+# ******** CANCIONES ********
+build_canciones:
+  stage: build
+  tags:
+    - ayd2
+  script:
+    - docker build -t alvarosp24/ayd2_canciones ./backend/Canciones;
+    - docker save alvarosp24/ayd2_canciones > ayd2_canciones.zip;
+  artifacts:
+    paths:
+      - ayd2_canciones.zip
+  only:
+    refs:
+      - main
+    changes:
+      - backend/Canciones/**/*
+  allow_failure: false
+# ******** LOGINFLOW ********
+build_loginflow:
+  stage: build
+  tags:
+    - ayd2
+  script:
+    - docker build -t alvarosp24/ayd2_loginflow ./backend/LoginFlow;
+    - docker save alvarosp24/ayd2_loginflow > ayd2_loginflow.zip;
+  artifacts:
+    paths:
+      - ayd2_loginflow.zip
+  only:
+    refs:
+      - main
+    changes:
+      - backend/LoginFlow/**/*
+  allow_failure: false
+# ******** MIDDLEWARE ********
+build_middleware:
+  stage: build
+  tags:
+    - ayd2
+  script:
+    - docker build -t alvarosp24/ayd2_middleware ./backend/middleware;
+    - docker save alvarosp24/ayd2_middleware > ayd2_middleware.zip;
+  artifacts:
+    paths:
+      - ayd2_middleware.zip
+  only:
+    refs:
+      - main
+    changes:
+      - backend/middleware/**/*
+  allow_failure: false
+# ******** USUARIO ********
+build_usuario:
+  stage: build
+  tags:
+    - ayd2
+  script:
+    - docker build -t alvarosp24/ayd2_usuario ./backend/Usuario;
+    - docker save alvarosp24/ayd2_usuario > ayd2_usuario.zip;
+  artifacts:
+    paths:
+      - ayd2_usuario.zip
+  only:
+    refs:
+      - main
+    changes:
+      - backend/Usuario/**/*
+  allow_failure: false
+# ******** FRONTEND ********
+build_frontend:
+  stage: build
+  tags:
+    - ayd2
+  script:
+    - docker build -t alvarosp24/ayd2_frontend ./frontend;
+    - docker save alvarosp24/ayd2_frontend > ayd2_frontend.zip;
+  artifacts:
+    paths:
+      - ayd2_frontend.zip
+  only:
+    refs:
+      - main
+    changes:
+      - frontend/**/*
+  allow_failure: false
+
+###! ------------- SUBIDA DE IMAGENES A DOCKERHUB ------------------
+ # ******** ADMIN ********
+post_admin:
+  stage: post
+  tags:
+    - ayd2
+  before_script:
+    - docker login -u $USERDOCKER -p $PASSDOCKER
+  script:
+    - docker load < ayd2_admin.zip
+    - docker push alvarosp24/ayd2_admin:latest
+    # - docker stop ayd2_admin
+    - docker rmi alvarosp24/ayd2_admin
+  only:
+    refs:
+      - main
+    changes:
+      - backend/Admin/**/*
+  needs:
+    - build_admin
+  allow_failure: false
+# ******** ALBUMS ********
+post_crear:
+  stage: post
+  tags:
+    - ayd2
+  before_script:
+    - docker login -u $USERDOCKER -p $PASSDOCKER
+  script:
+    - docker load < ayd2_crear.zip
+    - docker push alvarosp24/ayd2_crear:latest
+    # - docker stop ayd2_crear
+    - docker rmi alvarosp24/ayd2_crear
+  only:
+    refs:
+      - main
+    changes:
+      - backend/Albums/Crear/**/*
+  needs:
+    - build_crear
+  allow_failure: false
+post_editar:
+  stage: post
+  tags:
+    - ayd2
+  before_script:
+    - docker login -u $USERDOCKER -p $PASSDOCKER
+  script:
+    - docker load < ayd2_editar.zip
+    - docker push alvarosp24/ayd2_editar:latest
+    # - docker stop ayd2_editar
+    - docker rmi alvarosp24/ayd2_editar
+  only:
+    refs:
+      - main
+    changes:
+      - backend/Albums/Editar/**/*
+  needs:
+    - build_editar
+  allow_failure: false
+post_eliminar:
+  stage: post
+  tags:
+    - ayd2
+  before_script:
+    - docker login -u $USERDOCKER -p $PASSDOCKER
+  script:
+    - docker load < ayd2_eliminar.zip
+    - docker push alvarosp24/ayd2_eliminar:latest
+    # - docker stop ayd2_eliminar
+    - docker rmi alvarosp24/ayd2_eliminar
+  only:
+    refs:
+      - main
+    changes:
+      - backend/Albums/Eliminar/**/*
+  needs:
+    - build_eliminar
+  allow_failure: false
+post_listar:
+  stage: post
+  tags:
+    - ayd2
+  before_script:
+    - docker login -u $USERDOCKER -p $PASSDOCKER
+  script:
+    - docker load < ayd2_listar.zip
+    - docker push alvarosp24/ayd2_listar:latest
+    # - docker stop ayd2_listar
+    - docker rmi alvarosp24/ayd2_listar
+  only:
+    refs:
+      - main
+    changes:
+      - backend/Albums/Listar/**/*
+  needs:
+    - build_listar
+  allow_failure: false
+# ******** CANCIONES ********
+post_canciones:
+  stage: post
+  tags:
+    - ayd2
+  before_script:
+    - docker login -u $USERDOCKER -p $PASSDOCKER
+  script:
+    - docker load < ayd2_canciones.zip
+    - docker push alvarosp24/ayd2_canciones:latest
+    # - docker stop ayd2_canciones
+    - docker rmi alvarosp24/ayd2_canciones
+  only:
+    refs:
+      - main
+    changes:
+      - backend/Canciones/**/*
+  needs:
+    - build_canciones
+  allow_failure: false
+# ******** LOGINFLOW ********
+post_loginflow:
+  stage: post
+  tags:
+    - ayd2
+  before_script:
+    - docker login -u $USERDOCKER -p $PASSDOCKER
+  script:
+    - docker load < ayd2_loginflow.zip
+    - docker push alvarosp24/ayd2_loginflow:latest
+    # - docker stop ayd2_loginflow
+    - docker rmi alvarosp24/ayd2_loginflow
+  only:
+    refs:
+      - main
+    changes:
+      - backend/LoginFlow/**/*
+  needs:
+    - build_loginflow
+  allow_failure: false
+# ******** MIDDLEWARE ********
+post_middleware:
+  stage: post
+  tags:
+    - ayd2
+  before_script:
+    - docker login -u $USERDOCKER -p $PASSDOCKER
+  script:
+    - docker load < ayd2_middleware.zip
+    - docker push alvarosp24/ayd2_middleware:latest
+    # - docker stop ayd2_middleware
+    - docker rmi alvarosp24/ayd2_middleware
+  only:
+    refs:
+      - main
+    changes:
+      - backend/middleware/**/*
+  needs:
+    - build_middleware
+  allow_failure: false
+# ******** USUARIO ********
+post_usuario:
+  stage: post
+  tags:
+    - ayd2
+  before_script:
+    - docker login -u $USERDOCKER -p $PASSDOCKER
+  script:
+    - docker load < ayd2_usuario.zip
+    - docker push alvarosp24/ayd2_usuario:latest
+    # - docker stop ayd2_usuario
+    - docker rmi alvarosp24/ayd2_usuario
+  only:
+    refs:
+      - main
+    changes:
+      - backend/Usuario/**/*
+  needs:
+    - build_usuario
+  allow_failure: false
+# ******** FRONTEND ********
+post_frontend:
+  stage: post
+  tags:
+    - ayd2
+  before_script:
+    - docker login -u $USERDOCKER -p $PASSDOCKER
+  script:
+    - docker load < ayd2_frontend.zip
+    - docker push alvarosp24/ayd2_frontend:latest
+    # - docker stop ayd2_frontend
+    - docker rmi alvarosp24/ayd2_frontend
+  only:
+    refs:
+      - main
+    changes:
+      - frontend/**/*
+  needs:
+    - build_frontend
+  allow_failure: false
+
+###! ------------- KUBECTL AMBIENTE PRODUCCION ------------------
+# Una vez las imágenes estén en el repositorio de contenedores, se procederá a utilizar una
+# herramienta de gitlab-runner para ejecutar y configurar kubernetes en el ambiente de producción.
+ # ******** ADMIN ********
+deploy-admin:
+  # image:
+  #   name: bitnami/kubectl:latest
+  #   entrypoint: [""]
+  stage: deploy
+  tags:
+    - ayd2
+  before_script:
+    - sudo kubectl config get-contexts
+    - sudo kubectl config use-context gke_ayd-vacas-junio_us-central1-a_k8s-demo
+  script:
+    - sudo kubectl delete -f kubernetes/deployments/admin.yml
+    - sudo kubectl apply -f kubernetes/deployments/admin.yml
+  only:
+    refs:
+      - main
+    changes:
+      - backend/Admin/**/*
+  needs:
+    - post_admin
+  allow_failure: false
+
+# ******** ALBUMS ********
+deploy-crear:
+  # image:
+  #   name: bitnami/kubectl:latest
+  #   entrypoint: [""]
+  stage: deploy
+  tags:
+    - ayd2
+  before_script:
+    - sudo kubectl config get-contexts
+    - sudo kubectl config use-context gke_ayd-vacas-junio_us-central1-a_k8s-demo
+  script:
+    - sudo kubectl delete -f kubernetes/deployments/crear.yml
+    - sudo kubectl apply -f kubernetes/deployments/crear.yml
+  only:
+    refs:
+      - main
+    changes:
+      - backend/Albums/Crear/**/*
+  needs:
+    - post_crear
+  allow_failure: false
+deploy-editar:
+  # image:
+  #   name: bitnami/kubectl:latest
+  #   entrypoint: [""]
+  stage: deploy
+  tags:
+    - ayd2
+  before_script:
+    - sudo kubectl config get-contexts
+    - sudo kubectl config use-context gke_ayd-vacas-junio_us-central1-a_k8s-demo
+  script:
+    - sudo kubectl delete -f kubernetes/deployments/editar.yml
+    - sudo kubectl apply -f kubernetes/deployments/editar.yml
+  only:
+    refs:
+      - main
+    changes:
+      - backend/Albums/Editar/**/*
+  needs:
+    - post_editar
+  allow_failure: false
+deploy-eliminar:
+  # image:
+  #   name: bitnami/kubectl:latest
+  #   entrypoint: [""]
+  stage: deploy
+  tags:
+    - ayd2
+  before_script:
+    - sudo kubectl config get-contexts
+    - sudo kubectl config use-context gke_ayd-vacas-junio_us-central1-a_k8s-demo
+  script:
+    - sudo kubectl delete -f kubernetes/deployments/eliminar.yml
+    - sudo kubectl apply -f kubernetes/deployments/eliminar.yml
+  only:
+    refs:
+      - main
+    changes:
+      - backend/Albums/Eliminar/**/*
+  needs:
+    - post_eliminar
+  allow_failure: false
+deploy-listar:
+  # image:
+  #   name: bitnami/kubectl:latest
+  #   entrypoint: [""]
+  stage: deploy
+  tags:
+    - ayd2
+  before_script:
+    - sudo kubectl config get-contexts
+    - sudo kubectl config use-context gke_ayd-vacas-junio_us-central1-a_k8s-demo
+  script:
+    - sudo kubectl delete -f kubernetes/deployments/listar.yml
+    - sudo kubectl apply -f kubernetes/deployments/listar.yml
+  only:
+    refs:
+      - main
+    changes:
+      - backend/Albums/Listar/**/*
+  needs:
+    - post_listar
+  allow_failure: false
+# ******** CANCIONES ********
+deploy-canciones:
+  # image:
+  #   name: bitnami/kubectl:latest
+  #   entrypoint: [""]
+  stage: deploy
+  tags:
+    - ayd2
+  before_script:
+    - sudo kubectl config get-contexts
+    - sudo kubectl config use-context gke_ayd-vacas-junio_us-central1-a_k8s-demo
+  script:
+    - sudo kubectl delete -f kubernetes/deployments/canciones.yml
+    - sudo kubectl apply -f kubernetes/deployments/canciones.yml
+  only:
+    refs:
+      - main
+    changes:
+      - backend/Canciones/**/*
+  needs:
+    - post_canciones
+  allow_failure: false
+# ******** LOGINFLOW ********
+deploy-loginflow:
+  # image:
+  #   name: bitnami/kubectl:latest
+  #   entrypoint: [""]
+  stage: deploy
+  tags:
+    - ayd2
+  before_script:
+    - sudo kubectl config get-contexts
+    - sudo kubectl config use-context gke_ayd-vacas-junio_us-central1-a_k8s-demo
+  script:
+    - sudo kubectl delete -f kubernetes/deployments/loginflow.yml
+    - sudo kubectl apply -f kubernetes/deployments/loginflow.yml
+  only:
+    refs:
+      - main
+    changes:
+      - backend/LoginFLow/**/*
+  needs:
+    - post_loginflow
+  allow_failure: false
+# ******** MIDDLEWARE ********
+deploy-middleware:
+  # image:
+  #   name: bitnami/kubectl:latest
+  #   entrypoint: [""]
+  stage: deploy
+  tags:
+    - ayd2
+  before_script:
+    - sudo kubectl config get-contexts
+    - sudo kubectl config use-context gke_ayd-vacas-junio_us-central1-a_k8s-demo
+  script:
+    - sudo kubectl delete -f kubernetes/deployments/middleware.yml
+    - sudo kubectl apply -f kubernetes/deployments/middleware.yml
+  only:
+    refs:
+      - main
+    changes:
+      - backend/middleware/**/*
+  needs:
+    - post_middleware
+  allow_failure: false
+# ******** USUARIO ********
+deploy-usuario:
+  # image:
+  #   name: bitnami/kubectl:latest
+  #   entrypoint: [""]
+  stage: deploy
+  tags:
+    - ayd2
+  before_script:
+    - sudo kubectl config get-contexts
+    - sudo kubectl config use-context gke_ayd-vacas-junio_us-central1-a_k8s-demo
+  script:
+    - sudo kubectl delete -f kubernetes/deployments/usuario.yml
+    - sudo kubectl apply -f kubernetes/deployments/usuario.yml
+  only:
+    refs:
+      - main
+    changes:
+      - backend/Usuario/**/*
+  needs:
+    - post_usuario
+  allow_failure: false
+# ******** FRONTEND ********
+deploy-frontend:
+  # image:
+  #   name: bitnami/kubectl:latest
+  #   entrypoint: [""]
+  stage: deploy
+  tags:
+    - ayd2
+  before_script:
+    - sudo kubectl config get-contexts
+    - sudo kubectl config use-context gke_ayd-vacas-junio_us-central1-a_k8s-demo
+  script:
+    - sudo kubectl delete -f kubernetes/deployments/frontend.yml
+    - sudo kubectl apply -f kubernetes/deployments/frontend.yml
+  only:
+    refs:
+      - main
+    changes:
+      - frontend/**/*
+  needs:
+    - post_frontend
+  allow_failure: false

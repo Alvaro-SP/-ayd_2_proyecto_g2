@@ -1,0 +1,55 @@
+.navbar {
+    background-color: rgba(34, 50, 99, 0.9);
+    backdrop-filter: blur(10px);
+    font-family: "Roboto", sans-serif;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 999;
+  }
+  
+  .navbar-brand {
+    color: #f8eb25;
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+  }
+  
+  .navbar-brand svg {
+    color: #f8eb25;
+    margin-right: 0.5rem;
+  }
+  
+  .navbar-nav .nav-link {
+    color: #f8eb25;
+    font-weight: bold;
+    transition: color 0.3s ease;
+  }
+  
+  .navbar-nav .nav-link:hover {
+    color: #fff;
+  }
+  
+  .navbar-toggler {
+    border-color: transparent;
+  }
+  
+  .navbar-toggler-icon {
+    background-color: #f8eb25;
+    border-radius: 2px;
+  }
+  
+  .btn {
+    color: #f8eb25;
+    background-color: transparent;
+    border: 2px solid #f8eb25;
+    font-weight: bold;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  .btn:hover {
+    background-color: #f8eb25;
+    color: #223263;
+  }
+  

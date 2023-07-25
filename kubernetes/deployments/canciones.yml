@@ -1,0 +1,58 @@
+#* =========  canciones =========
+# ! ------------ deployment ------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: canciones
+  namespace: proyecto
+spec:
+  selector:
+    matchLabels:
+      app: canciones
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: canciones
+    spec:
+      containers:
+        - name: canciones
+          # image: serchiboi/proy1_api:latest
+          image: alvarosp24/ayd2_canciones:latest
+          env:
+            - name: DB_HOST
+              value: "34.132.216.220"
+            - name: DB_USER
+              value: "root"
+            - name: DB_PASS
+              value: "Pokemon*150"
+            - name: DB_NAME
+              value: "mydb"
+            - name: DB_PORT
+              value: "3306"
+            - name: SERVER_PORT
+              value: "3003"
+            - name: AWS_ACCESS_KEY_ID
+              value: "AKIAQEIHG4AZLTVCNDFQ"
+            - name: AWS_SECRET_ACCESS_KEY
+              value: "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"
+            - name: AWS_REGION
+              value: "us-east-1"
+          ports:
+            - containerPort: 3003
+---
+# ! ------------ Service ------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: canciones
+  namespace: proyecto
+spec:
+  selector:
+    app: canciones
+  ports:
+    - name: canciones
+      port: 3003
+      targetPort: 3003
+  type: ClusterIP
+  # loadBalancerIP: 34.135.130.150

@@ -1,0 +1,129 @@
+
+
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+
+/* Estilos para el componente EditarAlbum */
+.editar-album-container {
+  margin: 20px;
+  background-color: rgb(9, 5, 49);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: -2px -2px 4px rgb(255, 253, 253);
+}
+
+.editar-album-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.editar-album-table th,
+.editar-album-table td {
+  padding: 12px;
+  text-align: center;
+  color: rgb(248, 241, 241);
+}
+
+.editar-album-table th {
+  background-color: #407882;
+  color: #fff;
+}
+
+.editar-album-table td {
+  border-bottom: 1px solid #8c8787;
+}
+
+.editar-album-table tr:last-child td {
+  border-bottom: 1px solid #8c8787;
+}
+
+.editar-album-table tr:hover {
+  background-color: #0a183e;
+}
+
+.editar-album-checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f6f7fa;
+  color: rgb(220, 33, 33);
+}
+
+.editar-album-checkbox input[type="checkbox"] {
+  margin: 0;
+  cursor: pointer;
+  background-color: #f6f7fa;
+  color: rgb(220, 33, 33);
+}
+
+.editar-album-button-primary,
+.editar-album-button {
+  width: 100%;
+  height: 40px;
+  font-size: 14px;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.editar-album-button-primary {
+  background-color: #2c387e;
+}
+
+.editar-album-button {
+  background-color: #407882;
+}
+
+.editar-album-image-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 100%;
+  height: 300px; /* Ajusta la altura según tus necesidades */
+}
+
+.editar-album-image {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.editar-album-button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px; /* Ajusta el margen superior según tus necesidades */
+}
+.editar-album-image + button {
+  margin-left: 30px; /* Añadir un margen a la izquierda del botón */
+}
+/* Animaciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease;
+}
+
+.slide-in {
+  animation: slideIn 0.5s ease;
+}
